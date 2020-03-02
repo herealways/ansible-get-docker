@@ -1,0 +1,4 @@
+- name: restart docker
+  systemd:
+    service: docker
+    state: restarted

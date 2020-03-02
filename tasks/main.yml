@@ -1,0 +1,188 @@
+- name: check distribution and set vars
+  block:
+    - set_fact:
+        use_yum: true
+        centos7: true
+      when: ansible_distribution == "CentOS" and ansible_distribution_major_version == '7'
+
+# currently there are some problems for centos8, like broken dns for container
+    - set_fact:
+        use_dnf: true
+        centos8: true
+      when: ansible_distribution == "CentOS" and ansible_distribution_major_version == '8' 
+
+    - set_fact:
+        use_dnf: true
+        fedora: true
+      when: ansible_distribution == "Fedora"
+
+    - name: use python3 interpreter for fedora
+      set_fact:
+        ansible_python_interpreter: /usr/bin/python3
+      when: fedora is defined
+
+- name: install Docker's dependencies
+  block:
+    - name: install docker's dependencies (yum)
+      yum:
+        name: "{{docker_package_dependencies_centos}}"
+      when: use_yum is defined
+
+    - name: install docker's dependencies (dnf)
+      dnf:
+        name: "{{docker_package_dependencies_fedora}}"
+      when: use_dnf is defined
+
+# should use ansible module
+- name: configure Docker's upstream repository 
+  block:
+    - shell: "yum-config-manager --add-repo {{docker_upstream_repo_centos}}"
+      when: use_yum is defined
+
+    - shell: "dnf config-manager --add-repo {{docker_upstream_repo_centos}}"
+      when: centos8 is defined
+
+    - shell: "dnf config-manager --add-repo {{docker_upstream_repo_fedora}}"
+      when: fedora is defined
+
+    # - copy:
+    #     src: "files/centos/docker-ce.repo"
+    #     dest: "/etc/yum.repos.d/docker-ce.repo"
+    #     mode: 0644
+    #   when: use_yum is defined and online_install is not defined
+
+    # - copy:
+    #     src: "files/fedora/docker-ce.repo"
+    #     dest: "/etc/yum.repos.d/docker-ce.repo"
+    #     mode: 0644
+    #   when: use_dnf is defined and online_install is not defined
+
+- name: install Docker
+  block:
+    - name: install Docker on centos7
+      yum:
+        name: "{{item}}"
+        state: "present"
+      loop:
+        - "docker-{{ docker_version_centos | d('ce') }}"
+        - "docker-ce-cli"
+        - "containerd.io"
+      when: use_yum is defined
+
+    # - name: install Docker on centos8
+    #   dnf:
+    #     name: "{{item}}"
+    #     state: "present"
+    #   loop:
+    #     - "docker-{{ docker_version_centos8 | d('ce') }}"
+    #     - "docker-ce-cli"
+    #     - "containerd.io"
+    #   when: centos8 is defined
+
+    - name: install Docker on fedora
+      dnf:
+        name: "{{item}}"
+        state: "present"
+      loop:
+        - "docker-{{ docker_version_fedora | d('ce') }}"
+        - "docker-ce-cli"
+        - "containerd.io"
+      when: fedora is defined
+
+- name: enable docker
+  service:
+    name: docker
+    enabled: yes
+    state: started
+
+- name: add users to docker group
+  user:
+    name: "{{item}}"
+    groups: "docker"
+    append: true
+  loop: "{{ docker_users }}"
+  when: docker_users is defined
+
+- name: configure docker daemon files
+  template:
+    src: "etc/docker/daemon.json.j2"
+    dest: "/etc/docker/daemon.json"
+    mode: "0644"
+    owner: "root"
+    group: "root"
+  when: docker_set_daemon_file == true
+  notify: ["restart docker"]
+
+
+- name: add certificates
+  copy:
+    src: "templates/etc/docker/certs.d"
+    dest: "/etc/docker/"
+    owner: "root"
+    group: "root"
+  when: docker_use_certificates == true
+
+- name: make sure Docker SDK for python and docker-compose is installed
+  block:
+  - name: add epel repository for centos7
+    yum:
+      name: epel-release
+      state: present
+    when: use_yum is defined
+
+  - name: make sure python3 is installed(yum)
+    yum:
+      name: python3
+      state: present
+    when: use_yum is defined
+
+  - name: make sure python3 is installed(dnf)
+    dnf:
+      name: python3
+      state: present
+    when: use_dnf is defined
+
+  
+  - name: change python interpreter to python3 for centos7
+    set_fact:
+      ansible_python_interpreter: /usr/bin/python3
+    when: centos7 is defined
+
+  - name: install Docker SDK and docker-compose
+    pip:
+      name: 
+      - docker
+      - docker-compose
+      executable: pip3
+
+
+- name: manage docker registry login credentials
+  docker_login:
+    registry_url: "{{docker_registry.registry_url | d(omit)}}"
+    username: "{{docker_registry.username}}"
+    password: "{{docker_registry.password}}"
+    email: "{{docker_registry.email | d(omit)}}"
+    reauthorize: "{{docker_registry.reauthorize | d(omit)}}"
+    config_path: "{{docker_registry.config_path  | d(omit)}}"
+    state: "{{docker_registry.state  | d('present')}}"
+  when: docker_set_login_credentials == true and docker_use_certificates == false
+
+- name: manage docker registry login credentials
+  docker_login:
+    registry_url: "{{docker_registry.registry_url | d(omit)}}"
+    ca_cert: "{{docker_registry.ca_cert | d(omit)}}"
+    username: "{{docker_registry.username}}"
+    password: "{{docker_registry.password}}"
+    email: "{{docker_registry.email | d(omit)}}"
+    reauthorize: "{{docker_registry.reauthorize | d(omit)}}"
+    config_path: "{{docker_registry.config_path  | d(omit)}}"
+    state: "{{docker_registry.state  | d('present')}}"
+  when: docker_set_login_credentials == true and docker_use_certificates == true
+  
+
+# To make sure subsequent yum module will work normally on centos7
+- name: change python interpreter from python3 to 2 for centos7
+  set_fact:
+    ansible_python_interpreter: /usr/bin/python
+  when: centos7 is defined
+
