@@ -4,7 +4,7 @@ This is an ansible role that installs and configure Docker on CentOS7 and Fedora
 By default, it will install the latest version of docker-ce, python3 when the platform is CentOS7 and install docker-compose through pip3
 
 ## Example
-'''yml
+```yml
 ---
 
 # get-docker.yml
@@ -13,7 +13,7 @@ By default, it will install the latest version of docker-ce, python3 when the pl
   tasks:
     - import_role:
         name: herealways.get-docker
-'''
+```
 
 Run: ansible-playbook get-docker.yml
 
