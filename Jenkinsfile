@@ -8,7 +8,7 @@ pipeline {
             }
             steps {
                 sh '''
-                ansible-playbook -i tests/inventory -b /var/jenkins_home/ansible/ansible_key tests/test.yml
+                ansible-playbook -i tests/inventory -b --private-key /var/jenkins_home/ansible/ansible_key tests/test.yml
                 '''
             }
         }
