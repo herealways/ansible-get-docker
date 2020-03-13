@@ -1,5 +1,5 @@
 ---
-- hosts: localhost
-  remote_user: root
+- hosts: test_vagrant
+  become: true
   roles:
     - get-docker

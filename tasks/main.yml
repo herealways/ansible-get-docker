@@ -155,6 +155,11 @@
       - docker-compose
       executable: pip3
 
+- name: test docker
+  docker_container:
+    name: hello
+    image: hello-world
+    auto_remove: yes
 
 - name: manage docker registry login credentials
   docker_login:
@@ -178,7 +183,6 @@
     config_path: "{{docker_registry.config_path  | d(omit)}}"
     state: "{{docker_registry.state  | d('present')}}"
   when: docker_set_login_credentials == true and docker_use_certificates == true
-  
 
 # To make sure subsequent yum module will work normally on centos7
 - name: change python interpreter from python3 to 2 for centos7
