@@ -71,8 +71,10 @@
       loop:
         - "docker-ce-cli"
         - "containerd.io"
-        - "docker-{{ docker_version_centos8 | d('ce') }}"
       when: centos8 is defined
+
+    - name: install Docker-ce on centos8
+      shell: "dnf install -y docker-ce --nobest"
 
     - name: install Docker on fedora
       dnf:
