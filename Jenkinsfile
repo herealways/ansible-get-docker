@@ -21,8 +21,12 @@ pipeline {
                     colorized: true,\
                     extras: "-u vagrant --private-key ${ANSIBLE_KEY}")
                 }
-                sh './Vagrant/vm_halt.sh'
             }
+        }
+    }
+    post {
+        always {
+            sh './Vagrant/vm_halt.sh'
         }
     }
 }
