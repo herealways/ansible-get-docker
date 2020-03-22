@@ -2,4 +2,4 @@
 - hosts: all
   become: true
   roles:
-    - ../ansible-get-docker_dev
+    - ../ansible_get_docker_dev
