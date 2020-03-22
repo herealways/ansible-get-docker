@@ -14,7 +14,7 @@ pipeline {
                 sh './Vagrant/vm_setup.sh'
                 withCredentials([sshUserPrivateKey(credentialsId: 'ansible_key',\
                 keyFileVariable: 'ANSIBLE_KEY')]) {
-                    ansiblePlaybook(playbook: 'tests/main.yml',\
+                    ansiblePlaybook(playbook: 'tests/test.yml',\
                     inventory: 'tests/inventory',\
                     //credentialsId: "${ANSIBLE_KEY}",\
                     hostKeyChecking : false,\
