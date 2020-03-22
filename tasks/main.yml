@@ -75,6 +75,7 @@
 
     - name: install Docker-ce on centos8
       shell: "dnf install -y docker-ce --nobest"
+      when: centos8 is defined
 
     - name: install Docker on fedora
       dnf:
