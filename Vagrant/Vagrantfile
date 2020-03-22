@@ -27,9 +27,9 @@ Vagrant.configure("2") do |config|
   end
 
   # Define Fedora30
-  config.vm.define "centos8_test" do |fedora30|
-    config.vm.hostname = "centos8"
-    fedora30.vm.box = "generic/centos8"
+  config.vm.define "fedora30" do |fedora30|
+    config.vm.hostname = "fedora30"
+    fedora30.vm.box = "generic/fedora30"
     fedora30.vm.network "private_network", ip: "10.0.4.5"
     fedora30.vm.provider "virtualbox" do |v|
 	v.memory = 1024
