@@ -17,5 +17,10 @@ fi
 
 # Refresh state. Check if the vm is aborted
 cd $VAGRANT_PROJECT_PATH && vagrant status
+aborted=$(vagrant global-status | awk '{if ($4=="aborted") {print $1}}')
+if [ -n "$aborted" ]; then
+    for id in "$aborted"; do
+        vagrant halt "$id"
+    done
 
 cd $VAGRANT_PROJECT_PATH && vagrant up
