@@ -22,5 +22,6 @@ if [ -n "$aborted" ]; then
     for id in "$aborted"; do
         vagrant halt "$id"
     done
+fi
 
 cd $VAGRANT_PROJECT_PATH && vagrant up
