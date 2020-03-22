@@ -67,6 +67,7 @@
       dnf:
         name: "{{item}}"
         state: "present"
+        skip_broken: yes
       loop:
         - "docker-ce-cli"
         - "containerd.io"
