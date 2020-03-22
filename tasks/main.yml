@@ -20,7 +20,7 @@
     - name: use python3 interpreter for fedora30 and centos8
       set_fact:
         ansible_python_interpreter: /usr/bin/python3
-      when: fedora is defined and centos8 is defined
+      when: fedora is defined or centos8 is defined
 
 - name: install Docker's dependencies
   block:
@@ -64,9 +64,9 @@
         name: "{{item}}"
         state: "present"
       loop:
-        - "docker-{{ docker_version_centos8 | d('ce') }}"
         - "docker-ce-cli"
         - "containerd.io"
+        - "docker-{{ docker_version_centos8 | d('ce') }}"
       when: centos8 is defined
 
     - name: install Docker on fedora
