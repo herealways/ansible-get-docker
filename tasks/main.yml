@@ -17,6 +17,10 @@
         fedora30: true
       when: ansible_distribution == "Fedora"
 
+    - name: install python3 for centos8
+      raw: "dnf -y install python3"
+      when: centos8 is defined
+
     - name: use python3 interpreter for fedora30 and centos8
       set_fact:
         ansible_python_interpreter: /usr/bin/python3
