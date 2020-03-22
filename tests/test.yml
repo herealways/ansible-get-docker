@@ -1,5 +1,5 @@
 ---
-- hosts: test_vagrant
+- hosts: all
   become: true
   roles:
-    - ../ansible-get-docker_dev
+    - ../ansible_get_docker_dev

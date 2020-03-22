@@ -2,7 +2,6 @@ docker_upstream_repo_centos: https://download.docker.com/linux/centos/docker-ce.
 docker_upstream_repo_fedora: https://download.docker.com/linux/fedora/docker-ce.repo
 
 # docker_version_centos: "ce-18.09.9-3.el7"
-# docker_version_centos8: "ce-18.09.9-3.el7"
 # docker_version_fedora: "ce-19.03.6-3.fc30"
 
 
