@@ -19,9 +19,10 @@ fi
 cd $VAGRANT_PROJECT_PATH && vagrant status
 aborted=$(vagrant global-status | awk '{if ($4=="aborted") {print $1}}')
 if [ -n "$aborted" ]; then
-    for id in "$aborted"; do
+    for id in ${aborted[@]}; do
         vagrant halt "$id"
     done
 fi
+cd $VAGRANT_PROJECT_PATH && vagrant status
 
 cd $VAGRANT_PROJECT_PATH && vagrant up
