@@ -14,12 +14,13 @@
     - set_fact:
         use_dnf: true
         fedora: true
+        fedora30: true
       when: ansible_distribution == "Fedora"
 
-    - name: use python3 interpreter for fedora
+    - name: use python3 interpreter for fedora30 and centos8
       set_fact:
         ansible_python_interpreter: /usr/bin/python3
-      when: fedora is defined
+      when: fedora is defined and centos8 is defined
 
 - name: install Docker's dependencies
   block:
@@ -45,18 +46,6 @@
     - shell: "dnf config-manager --add-repo {{docker_upstream_repo_fedora}}"
       when: fedora is defined
 
-    # - copy:
-    #     src: "files/centos/docker-ce.repo"
-    #     dest: "/etc/yum.repos.d/docker-ce.repo"
-    #     mode: 0644
-    #   when: use_yum is defined and online_install is not defined
-
-    # - copy:
-    #     src: "files/fedora/docker-ce.repo"
-    #     dest: "/etc/yum.repos.d/docker-ce.repo"
-    #     mode: 0644
-    #   when: use_dnf is defined and online_install is not defined
-
 - name: install Docker
   block:
     - name: install Docker on centos7
@@ -69,15 +58,16 @@
         - "containerd.io"
       when: use_yum is defined
 
-    # - name: install Docker on centos8
-    #   dnf:
-    #     name: "{{item}}"
-    #     state: "present"
-    #   loop:
-    #     - "docker-{{ docker_version_centos8 | d('ce') }}"
-    #     - "docker-ce-cli"
-    #     - "containerd.io"
-    #   when: centos8 is defined
+    # See https://linuxconfig.org/how-to-install-docker-in-rhel-8
+    - name: install Docker on centos8
+      dnf:
+        name: "{{item}}"
+        state: "present"
+      loop:
+        - "docker-{{ docker_version_centos8 | d('ce') }}"
+        - "docker-ce-cli"
+        - "containerd.io"
+      when: centos8 is defined
 
     - name: install Docker on fedora
       dnf:
@@ -88,6 +78,16 @@
         - "docker-ce-cli"
         - "containerd.io"
       when: fedora is defined
+
+# See https://serverfault.com/questions/987686/no-network-connectivity-to-from-docker-ce-container-on-centos-8
+- name: Add masquerading in firewall-cmd fix container broken dns
+  firewalld:
+    masquerade: yes
+    zone: public
+    state: enabled
+    permanent: yes
+    immediate: yes
+  when: centos8 is defined
 
 - name: enable docker
   service:
@@ -153,7 +153,15 @@
       name: 
       - docker
       - docker-compose
+      - selinux  # Centos7 doesn't have libselinux-python for python3 by default
       executable: pip3
+
+# A Very strange bug in Vagrant happend in my environment:
+# Cannot resolve docker registry until restart docker daemon
+- name: restart docker to fix vagrant broken dns to docker registry
+  systemd:
+    service: docker
+    state: restarted
 
 - name: test docker
   docker_container:
@@ -172,19 +180,7 @@
     state: "{{docker_registry.state  | d('present')}}"
   when: docker_set_login_credentials == true and docker_use_certificates == false
 
-- name: manage docker registry login credentials
-  docker_login:
-    registry_url: "{{docker_registry.registry_url | d(omit)}}"
-    ca_cert: "{{docker_registry.ca_cert | d(omit)}}"
-    username: "{{docker_registry.username}}"
-    password: "{{docker_registry.password}}"
-    email: "{{docker_registry.email | d(omit)}}"
-    reauthorize: "{{docker_registry.reauthorize | d(omit)}}"
-    config_path: "{{docker_registry.config_path  | d(omit)}}"
-    state: "{{docker_registry.state  | d('present')}}"
-  when: docker_set_login_credentials == true and docker_use_certificates == true
-
-# To make sure subsequent yum module will work normally on centos7
+# To ensure subsequent yum module work normally on centos7
 - name: change python interpreter from python3 to 2 for centos7
   set_fact:
     ansible_python_interpreter: /usr/bin/python

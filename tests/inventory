@@ -1,2 +1,4 @@
 [test_vagrant]
 centos7 ansible_host=10.0.4.3
+centos8 ansible_host=10.0.4.4
+fedora30 ansible_host=10.0.4.5
