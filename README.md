@@ -3,8 +3,8 @@
 This is an ansible role that installs and configure Docker on CentOS7, CentOS8 and Fedora 30.  
 By default, it will install:
 * latest version of docker-ce (On CentOS8 it will install docker-ce-18.09.9-3)
-* docker-compose through pip3
-* python3 when the platform is CentOS7 and CentOS8
+* latest version of docker-compose through pip3
+* python3.6 when the platform is CentOS7 and CentOS8
 * docker and selinux module through pip3
 
 **Note:** For CentOS8, it will run something like `firewall-cmd --zone=public --add-masquerade --permanent` to [fix broken DNS in container](https://serverfault.com/questions/987686/no-network-connectivity-to-from-docker-ce-container-on-centos-8).
