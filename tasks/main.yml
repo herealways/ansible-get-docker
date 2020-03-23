@@ -5,7 +5,6 @@
         centos7: true
       when: ansible_distribution == "CentOS" and ansible_distribution_major_version == '7'
 
-# currently there are some problems for centos8, like broken dns for container
     - set_fact:
         use_dnf: true
         centos8: true
@@ -54,33 +53,30 @@
   block:
     - name: install Docker on centos7
       yum:
-        name: "{{item}}"
-        state: "present"
+        name: "{{ item }}"
+        state: latest
       loop:
         - "docker-{{ docker_version_centos | d('ce') }}"
         - "docker-ce-cli"
         - "containerd.io"
       when: use_yum is defined
 
-    # See https://linuxconfig.org/how-to-install-docker-in-rhel-8
+    # Using dnf localinstall to install docker
     - name: install Docker on centos8
       dnf:
-        name: "{{item}}"
-        state: "present"
-        skip_broken: yes
+        name: "{{ item }}"
+        state: latest
       loop:
-        - "docker-ce-cli"
-        - "containerd.io"
-      when: centos8 is defined
+        - "{{ centos8_docker-ce-cli_url }}"
+        - "{{ centos8_containerd.io_url }}"
+        - "{{ centos8_docker-ce_url }}"
 
-    - name: install Docker-ce on centos8
-      shell: "dnf install -y docker-ce --nobest"
       when: centos8 is defined
 
     - name: install Docker on fedora
       dnf:
-        name: "{{item}}"
-        state: "present"
+        name: "{{ item }}"
+        state: latest
       loop:
         - "docker-{{ docker_version_fedora | d('ce') }}"
         - "docker-ce-cli"
@@ -188,7 +184,7 @@
     state: "{{docker_registry.state  | d('present')}}"
   when: docker_set_login_credentials == true and docker_use_certificates == false
 
-# To ensure subsequent yum module work normally on centos7
+# To ensure subsequent yum module can work on centos7
 - name: change python interpreter from python3 to 2 for centos7
   set_fact:
     ansible_python_interpreter: /usr/bin/python
