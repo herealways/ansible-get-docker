@@ -18,6 +18,10 @@
 
     - name: install python3 for centos8
       raw: "dnf -y install python3"
+      retries: 5
+      delay: 3
+      register: python3_for_centos8
+      until: python3_for_centos8 is not failed
       when: centos8 is defined
 
     - name: use python3 interpreter for fedora30 and centos8
@@ -70,8 +74,11 @@
         - "{{ centos8_docker_ce_cli_url }}"
         - "{{ centos8_containerd_url }}"
         - "{{ centos8_docker_ce_url }}"
-
       when: centos8 is defined
+      retries: 5
+      delay: 3
+      register: docker_for_centos8
+      until: docker_for_centos8 is not failed
 
     - name: install Docker on fedora
       dnf:
