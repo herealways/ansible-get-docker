@@ -67,9 +67,9 @@
         name: "{{ item }}"
         state: latest
       loop:
-        - "{{ centos8_docker-ce-cli_url }}"
-        - "{{ centos8_containerd.io_url }}"
-        - "{{ centos8_docker-ce_url }}"
+        - "{{ centos8_docker_ce_cli_url }}"
+        - "{{ centos8_containerd_url }}"
+        - "{{ centos8_docker_ce_url }}"
 
       when: centos8 is defined
 

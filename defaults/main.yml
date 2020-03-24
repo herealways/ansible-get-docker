@@ -5,9 +5,9 @@ docker_upstream_repo_fedora: https://download.docker.com/linux/fedora/docker-ce.
 # docker_version_fedora: "ce-19.03.6-3.fc30"
 
 # https://download.docker.com/linux/centos/7/x86_64/stable/Packages/
-centos8_docker-ce-cli_url: "https://download.docker.com/linux/centos/7/x86_64/stable/Packages/docker-ce-cli-19.03.8-3.el7.x86_64.rpm"
-centos8_containerd.io_url: "https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.6-3.3.el7.x86_64.rpm"
-centos8_docker-ce_url: "https://download.docker.com/linux/centos/7/x86_64/stable/Packages/docker-ce-19.03.8-3.el7.x86_64.rpm"
+centos8_docker_ce_cli_url: "https://download.docker.com/linux/centos/7/x86_64/stable/Packages/docker-ce-cli-19.03.8-3.el7.x86_64.rpm"
+centos8_containerd_url: "https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.6-3.3.el7.x86_64.rpm"
+centos8_docker_ce_url: "https://download.docker.com/linux/centos/7/x86_64/stable/Packages/docker-ce-19.03.8-3.el7.x86_64.rpm"
 
 docker_package_dependencies_centos:
   - "yum-utils"

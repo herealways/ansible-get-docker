@@ -4,37 +4,40 @@ Vagrant.configure("2") do |config|
   
   # Define CentOS7
   config.vm.define "centos7_test" do |centos7|
-    config.vm.hostname = "centos7"
+    centos7.vm.hostname = "centos7"
     centos7.vm.box = "generic/centos7"
     centos7.vm.network "private_network", ip: "10.0.4.3"
     centos7.vm.provider "virtualbox" do |v|
-	v.memory = 1024
-	v.cpus = 1
-	v.gui = false
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+	    v.memory = 1024
+	    v.cpus = 1
+	    v.gui = false
     end
   end
 
   # Define CentOS8
   config.vm.define "centos8_test" do |centos8|
-    config.vm.hostname = "centos8"
+    centos8.vm.hostname = "centos8"
     centos8.vm.box = "generic/centos8"
     centos8.vm.network "private_network", ip: "10.0.4.4"
     centos8.vm.provider "virtualbox" do |v|
-	v.memory = 1024
-	v.cpus = 1
-	v.gui = false
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+	    v.memory = 1024
+	    v.cpus = 1
+	    v.gui = false
     end
   end
 
   # Define Fedora30
   config.vm.define "fedora30_test" do |fedora30|
-    config.vm.hostname = "fedora30"
+    fedora30.vm.hostname = "fedora30"
     fedora30.vm.box = "generic/fedora30"
     fedora30.vm.network "private_network", ip: "10.0.4.5"
     fedora30.vm.provider "virtualbox" do |v|
-	v.memory = 1024
-	v.cpus = 1
-	v.gui = false
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+	    v.memory = 1024
+	    v.cpus = 1
+	    v.gui = false
     end
   end
 end
