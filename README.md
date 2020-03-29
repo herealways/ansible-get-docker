@@ -1,11 +1,15 @@
 ## ansible-get-docker
 
-This is an ansible role that installs and configure Docker on CentOS7, CentOS8 and Fedora 30.  
+This is an ansible role that installs and configures Docker on CentOS7, CentOS8 and Fedora 30.  
 By default, it will install:
 * latest version of docker-ce (For CentOS8 it may not be the case since it use dnf localinstall)
 * latest version of docker-compose through pip3
 * latest version of python3.6 when the platform is CentOS7 and CentOS8
 * latest version of docker and selinux module through pip3
+
+It can also:
+* Add users to docker group.
+* Use custom custom setting files.
 
 **Note:** For CentOS8, it will run something like `firewall-cmd --zone=public --add-masquerade --permanent` to [fix broken DNS in container](https://serverfault.com/questions/987686/no-network-connectivity-to-from-docker-ce-container-on-centos-8).
 
